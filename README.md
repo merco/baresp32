@@ -13,3 +13,45 @@ Controller di un bar automatico su ESP32-C3 con:
 - OTA update (`esp32c3-ota`)
 - captive portal DNS su AP locale
 - debug seriale + telnet su porta 23
+
+## Web site locale 192.168.4.1 
+
+- Accesso
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/Index_0.JPG" width="250" alt="Accesso">
+
+- Pagina principale
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/Index_1.JPG" width="250" alt="Principale">
+
+- Listino
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/listino.JPG" width="250" alt="Listino">
+
+- Statistiche
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/statistiche.JPG" width="250" alt="Listino">
+
+
+- Setup
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/setup1.JPG" width="250" alt="Setup1">
+
+<img src="https://github.com/merco/baresp32/blob/main/images/setup2.JPG" width="250" alt="Setup2">
+
+- Rifornimento
+  
+<img src="https://github.com/merco/baresp32/blob/main/images/setup_ingredienti.JPG" width="250" alt="Refill">
+
+
+
+
+## Editor Web esterno facilitato
+
+
+<img src="https://github.com/merco/baresp32/blob/main/images/Editor_1.JPG" width="250" alt="Editor">
+
+<img src="https://github.com/merco/baresp32/blob/main/images/Editor_2.JPG" width="250" alt="Editor">
+
+
+
