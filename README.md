@@ -1,7 +1,17 @@
-## baresp32
+# baresp32
+
+Il dispositivo è in grado di dosare 8 ingredienti distinti. Di ogni pompa deve essere indicata la portata.
+
+Le pompe P3/P4 hanno una portata per liquidi piatti di 8.265 ml/s, le rimanenti di 9.025 ml/s
+
+Il dispositivo fa da access point ( rete: "BarESP32" pwd : 12345678) 
+
+ma può anche collegarsi al WiFi esistente (vedi pagina http://192.168.4.1/wifisetup)
 
 
-## Scopo del firmware
+
+## tecnicamente
+
 Controller di un bar automatico su ESP32-C3 con:
 - 8 pompe dosatrici per ingredienti
 - UI web locale (setup, servizio cocktail, statistiche)
