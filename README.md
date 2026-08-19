@@ -1,5 +1,9 @@
 # baresp32
 
+
+<img src="https://github.com/merco/baresp32/blob/main/images/Fronte1.jpg" width="200" alt="Baresp32">
+
+
 Il dispositivo è in grado di dosare 8 ingredienti distinti. Di ogni pompa deve essere indicata la portata.
 
 Le pompe P3/P4 hanno una portata per liquidi piatti di 8.265 ml/s, le rimanenti di 9.025 ml/s
