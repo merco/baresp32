@@ -1,0 +1,154 @@
+{
+  "ingredienti": [
+    {
+      "nome": "Acqua Frizzante",
+      "ml": 1500,
+      "p": 5
+    },
+    {
+      "nome": "Vino Bianco",
+      "ml": 1500,
+      "p": 5
+    },
+    {
+      "nome": "Aperol",
+      "ml": 1500,
+      "p": 9.5
+    },
+    {
+      "nome": "Prodotto Liscio1",
+      "ml": 1501,
+      "p": 8.265
+    },
+    {
+      "nome": "Prodotto Liscio2",
+      "ml": 1500,
+      "p": 8.265
+    },
+    {
+      "nome": "L6",
+      "ml": 1500,
+      "p": 9.025
+    },
+    {
+      "nome": "L7coc",
+      "ml": 1500,
+      "p": 8.85
+    },
+    {
+      "nome": "L8",
+      "ml": 1500,
+      "p": 9.5
+    }
+  ],
+  "ricette": [
+    {
+      "nome": "Spritz Classico",
+      "ingredienti": [
+        {
+          "id": 1,
+          "ml": 60
+        },
+        {
+          "id": 2,
+          "ml": 40
+        }
+      ]
+    },
+    {
+      "nome": "Spritz Light",
+      "ingredienti": [
+        {
+          "id": 1,
+          "ml": 40
+        },
+        {
+          "id": 2,
+          "ml": 20
+        },
+        {
+          "id": 0,
+          "ml": 20
+        }
+      ]
+    },
+    {
+      "nome": "TestPompe 100ml",
+      "ingredienti": [
+        {
+          "id": 3,
+          "ml": 50
+        },
+        {
+          "id": 5,
+          "ml": 50
+        }
+      ]
+    },
+    {
+      "nome": "TestPompe 150ml",
+      "ingredienti": [
+        {
+          "id": 3,
+          "ml": 75
+        },
+        {
+          "id": 5,
+          "ml": 75
+        }
+      ]
+    },
+    {
+      "nome": "TestPompe 200ml",
+      "ingredienti": [
+        {
+          "id": 3,
+          "ml": 100
+        },
+        {
+          "id": 5,
+          "ml": 100
+        }
+      ]
+    },
+    {
+      "nome": "coca100",
+      "ingredienti": [
+        {
+          "id": 6,
+          "ml": 100
+        }
+      ]
+    },
+    {
+      "nome": "coca200",
+      "ingredienti": [
+        {
+          "id": 6,
+          "ml": 200
+        }
+      ]
+    }
+  ],
+  "parametri": {
+    "Ric_default": 0,
+    "velocita": 84,
+    "ripetizioni": 1
+  },
+  "frasi": [
+    "Se non ti piace il cocktail , parla col tecnico, non col barman!",
+    "Attenzione: dopo questo drink potresti diventare più simpatico del previsto.",
+    "Shakerando… anche se qui non c’è nessuno che shakera davvero.",
+    "Cin cin! Se senti la testa leggera… è il WiFi, non l’alcol.",
+    "Il tuo drink è arrivato. Lui sì che ti capisce.",
+    "Il tuo drink è arrivato. Lui sì che ti capisce.",
+    "Le amicizie migliori iniziano con: ‘Ne facciamo un altro?’",
+    "Sete rilevata. Avvio procedura di idratazione… alcolica.",
+    "Complimenti! Hai sbloccato il livello ‘Bevitore Esperto’.",
+    "Questo cocktail è talmente buono che potresti volerlo abbracciare.",
+    "Bere da soli è triste. Bere in compagnia è un bug che non correggeremo mai.",
+    "Secondo i miei calcoli… ti mancava proprio questo drink.",
+    "Bevi responsabilmente. O almeno divertiti mentre ci provi.",
+    "Complimenti! Hai sbloccato il livello ‘Bevitore Esperto’."
+  ]
+}
