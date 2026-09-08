@@ -148,6 +148,14 @@ unsigned long ultimoTempoBottone = 0;
 const unsigned long debounceDelay = 250; // Millisecondi di attesa antirimbalzo
 bool bottonePremuto = false;
 
+// Valore sentinella di Ric_default che abilita la scelta ricetta dal numero di pressioni
+const int RIC_DEFAULT_MULTIPRESS = 250;
+const unsigned long MULTIPRESS_WINDOW_MS = 5000;   // finestra scorrevole dall'ultima pressione
+const unsigned long MULTIPRESS_DEBOUNCE_MS = 80;   // antirimbalzo piu' corto per contare pressioni rapide
+int multiPressCount = 0;
+unsigned long multiPressLastMs = 0;
+bool multiPressAttivo = false;
+
 
 HX711 scale;
 
@@ -3132,6 +3140,97 @@ RemoteSerial.startTelnet();
     Serial.println(F("SitemaON !!!"));
 }
 
+void mostraConteggioLed(int n) {
+  FastLED_min<LED_PIN>.setBrightness(255); // breatheStrip modifica la luminosita': va ripristinata
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = (i < n) ? CRGB::Blue : CRGB::Black;
+  }
+  FastLED_min<LED_PIN>.show();
+}
+
+// Evita che erogaIngrediente() interpreti il bottone ancora premuto come richiesta di STOP
+void attendiRilascioBottone() {
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    Serial.println(F("[MP] Attendo rilascio bottone prima di erogare..."));
+  }
+  unsigned long stabileDa = millis();
+  while (millis() - stabileDa < 50) {
+    if (digitalRead(BUTTON_PIN) == LOW) stabileDa = millis();
+    delay(5);
+  }
+}
+
+// Ric_default == RIC_DEFAULT_MULTIPRESS: N pressioni entro la finestra erogano ricette[N-1]
+void gestioneBottoneMultiPress() {
+  int reading = digitalRead(BUTTON_PIN);
+  unsigned long now = millis();
+
+  if (reading == LOW && !bottonePremuto) {
+    if ((now - ultimoTempoBottone) > MULTIPRESS_DEBOUNCE_MS) {
+      bottonePremuto = true;
+      ultimoTempoBottone = now;
+      multiPressCount++;
+      multiPressLastMs = now;
+      multiPressAttivo = true;
+      Serial.printf("[MP] Pressione #%d - finestra riarmata (%lu ms)\n", multiPressCount, MULTIPRESS_WINDOW_MS);
+      mostraConteggioLed(multiPressCount);
+    }
+    return;
+  }
+
+  if (reading == LOW && bottonePremuto) {
+    if (multiPressAttivo && (now - ultimoTempoBottone) > MULTIPRESS_WINDOW_MS) {
+      Serial.println(F("[MP] Pressione lunga rilevata - annullamento selezione"));
+      flashStrip(CRGB::Red, 100, 1500);
+      multiPressAttivo = false;
+      multiPressCount = 0;
+      attendiRilascioBottone();
+      bottonePremuto = false;
+      FastLED_min<LED_PIN>.clear();
+      FastLED_min<LED_PIN>.show();
+    }
+    return;
+  }
+
+  if (reading == HIGH && bottonePremuto) {
+    bottonePremuto = false;
+    Serial.printf("[MP] Rilascio dopo %lu ms\n", now - ultimoTempoBottone);
+    return;
+  }
+
+  if (!multiPressAttivo || bottonePremuto) return;
+  if ((now - multiPressLastMs) <= MULTIPRESS_WINDOW_MS) return;
+
+  int conteggio = multiPressCount;
+  int idx = conteggio - 1;
+  multiPressAttivo = false;
+  multiPressCount = 0;
+
+  Serial.printf("[MP] Finestra scaduta. Conteggio finale: %d -> ricetta idx %d (ricette caricate: %d)\n",
+                conteggio, idx, (int)ricette.size());
+
+  if (idx < 0 || idx >= (int)ricette.size()) {
+    Serial.println(F("[MP] Indice ricetta NON valido: erogazione annullata"));
+    flashStrip(CRGB::Red, 100, 1500);
+    return;
+  }
+
+  Serial.print(F("[MP] Ricetta selezionata: "));
+  Serial.println(ricette[idx].nome);
+
+  if (!ricettaDisponibile(idx)) {
+    Serial.println(F("[MP] Ingredienti insufficienti: erogazione annullata"));
+    flashStrip(CRGB::Red, 100, 1500);
+    return;
+  }
+
+  attendiRilascioBottone();
+  fillStrip(CRGB::Blue);
+  eseguiRicetta(idx);
+  FastLED_min<LED_PIN>.clear();
+  FastLED_min<LED_PIN>.show();
+}
+
 void gestioneBottone() {
 
   if (setupPortataAttiva) {
@@ -3163,6 +3262,11 @@ void gestioneBottone() {
     return;
   }
 
+  if (parametri.Ric_default == RIC_DEFAULT_MULTIPRESS) {
+    gestioneBottoneMultiPress();
+    return;
+  }
+
 // LEGGI IL STATO DEL PULSANTE
   int reading = digitalRead(BUTTON_PIN);
 
@@ -3171,7 +3275,7 @@ void gestioneBottone() {
      Serial.println(F("Pulsante push!"));
     // Controlla se è passato abbastanza tempo dall'ultima pressione (Debounce)
     if ((millis() - ultimoTempoBottone) > debounceDelay) {
-      Serial.println(F("Pulsante premuto! Preparazione cocktail di default..."));
+      Serial.printf("Pulsante premuto! Preparazione ricetta di default (idx %d)...\n", parametri.Ric_default);
       
       // Accendi i LED di un colore specifico per feedback visivo (es. Blu)
       for(int i = 0; i < NUM_LEDS; i++) {
@@ -3208,7 +3312,8 @@ void loop() {
   dnsServer.processNextRequest();
   gestioneBottone();
 
-  
+  if (multiPressAttivo) return; // il respiro sovrascriverebbe i LED di conteggio
+
   // 3. Richiamiamo la funzione respiro passando il colore corrente estratto dall'array
   breatheStrip( BREATHE_DURATION);
 }

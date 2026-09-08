@@ -7,7 +7,7 @@ Controller di un bar automatico su ESP32-C3 con:
 - calibrazione portata pompe con procedura guidata a 100ml (`setup_portata`)
 - salvataggio configurazioni su SPIFFS (`/db.json`, `/utenti.json`, `/wifi.json`)
 - LED WS2812B come feedback stato
-- pulsante fisico per erogazione ricetta di default
+- pulsante fisico per erogazione ricetta di default (o selezione ricetta per numero di pressioni se `Ric_default = 250`)
 - bilancia HX711 (test/diagnostica)
 - OTA update (`esp32c3-ota`)
 - captive portal DNS su AP locale
@@ -101,6 +101,22 @@ Se il JSON contiene un valore fuori intervallo o non intero, il firmware e la pa
 
 ## Altri link esterni trovati (non Altervista)
 - `https://gitlab.com/Vishal1695/fastled_min` (commento libreria LED)
+
+## Parametro `parametri.Ric_default`
+Indice (0-based) della ricetta erogata dalla pressione del pulsante fisico su GPIO `9`.
+Il valore sentinella `250` (`RIC_DEFAULT_MULTIPRESS`) abilita invece la modalita multi-pressione descritta sotto.
+
+## Modalita bottone multi-pressione (`Ric_default = 250`)
+- Gestita da `gestioneBottoneMultiPress()`, richiamata da `gestioneBottone()` prima della logica a pressione singola.
+- Ha priorita inferiore a `setupPortataAttiva`: durante la calibrazione portata il conteggio non e attivo.
+- Ogni pressione incrementa un contatore e riarma una finestra scorrevole di 5000 ms (`MULTIPRESS_WINDOW_MS`) a partire dall'ultima pressione.
+- Antirimbalzo dedicato di 80 ms (`MULTIPRESS_DEBOUNCE_MS`), piu corto dei 250 ms della modalita normale per poter contare pressioni rapide.
+- Alla scadenza della finestra (a pulsante rilasciato) viene erogata `ricette[N-1]`, quindi 1 pressione = prima ricetta, 2 pressioni = seconda, ecc.
+- Feedback LED: durante il conteggio si accendono N led blu (saturano a `NUM_LEDS`); l'effetto respiro e sospeso finche il conteggio e attivo.
+- Errori: indice fuori range o ingredienti insufficienti non erogano nulla e generano un lampeggio rosso (`flashStrip`).
+- Annullamento per pressione lunga: se il pulsante resta premuto senza rilascio per piu di `MULTIPRESS_WINDOW_MS` (5000 ms), la selezione in corso viene annullata (nessuna ricetta erogata), il conteggio si azzera e tutti i led lampeggiano di rosso; si torna in attesa di una nuova prima pressione.
+- Prima di erogare si attende il rilascio stabile del pulsante, altrimenti `erogaIngrediente()` interpreterebbe la pressione come richiesta di STOP.
+- Tutto il ciclo e tracciato su seriale/telnet con prefisso `[MP]`: pressione, rilascio, conteggio finale, ricetta selezionata ed esito.
 
 ## Procedura setup_portata (dettaglio)
 - Selezione pompa da combo (`0..7`).
