@@ -42,10 +42,6 @@ http://192.168.1.67/wifisetup
 #include <ArduinoOTA.h>
 #include <esp_wifi.h>
 #include "esp_bt.h"
-#include <DNSServer.h>
-
-DNSServer dnsServer;
-const byte DNS_PORT = 53;
 
 
 
@@ -2414,26 +2410,9 @@ if (scale.is_ready()) {
 
 
  void setupCaptivePortal() {
-  // 1. Reindirizza qualsiasi query DNS verso l'IP dell'ESP32
-  dnsServer.start(DNS_PORT, "*", WiFi.softAPIP());
-
-  // 2. Handler universale di reindirizzamento
-  auto handleCaptiveRedirect = []() {
-     Serial.println("DNS http://192.168.4.1 ");
-    server.sendHeader("Location", "http://192.168.4.1/", true);
-    // Android 10 richiede un body HTML col reindirizzamento JS per attivare il popup WebView
-    server.send(302, "text/html", "<!DOCTYPE html><html><head><script>location.href='http://192.168.4.1/';</script></head><body>Reindirizzamento al Bar...</body></html>");
-  };
-
-  // Endpoint specifici usati da Android e dai vari sistemi operativi per il test connettività
-  server.on("/generate_204", handleCaptiveRedirect);
-  server.on("/gen_204", handleCaptiveRedirect);
-  server.on("/connecttest.txt", handleCaptiveRedirect);
-  server.on("/redirect", handleCaptiveRedirect);
-  server.on("/hotspot-detect.html", handleCaptiveRedirect); // Per iOS/Apple
-
-  // Tutte le altre rotte non trovate vengono reindirizzate
-  server.onNotFound(handleCaptiveRedirect);
+  // Captive portal disabilitato: in modalita' AP non deve comparire il popup
+  // di login/reindirizzamento automatico del telefono verso la pagina credenziali.
+  // (nessuna spoofing DNS, nessun redirect forzato sulle rotte non trovate)
 }
 // --------------------------------------------------
 // WEB SERVER
@@ -2968,7 +2947,8 @@ void setupWiFi() {
 
   // Avvio sempre AP
   Serial.println("Avvio Access Point...");
-  WiFi.mode(WIFI_AP_STA);
+  bool ssidConfigurato = wifi_ssid.length() > 0;
+  WiFi.mode(ssidConfigurato ? WIFI_AP_STA : WIFI_AP);
   WiFi.softAP("BarESP32", "12345678");
   applicaPotenzaWiFi();
   
@@ -2978,7 +2958,7 @@ void setupWiFi() {
   bool staConnected = false;
 
   // Se ho SSID valido → provo anche STA
-  if (wifi_ssid.length() > 0) {
+  if (ssidConfigurato) {
     Serial.println("Provo connessione WiFi STA...");
     WiFi.begin(wifi_ssid.c_str(), wifi_pass.c_str());
 
@@ -3309,7 +3289,6 @@ void loop() {
   ArduinoOTA.handle();
   server.handleClient();
   RemoteSerial.handle();
-  dnsServer.processNextRequest();
   gestioneBottone();
 
   if (multiPressAttivo) return; // il respiro sovrascriverebbe i LED di conteggio
