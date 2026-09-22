@@ -23,9 +23,8 @@ Controller di un bar automatico su ESP32-C3 con:
 - salvataggio configurazioni su SPIFFS (`/db.json`, `/utenti.json`, `/wifi.json`)
 - LED WS2812B come feedback stato
 - pulsante fisico per erogazione ricetta di default
-- bilancia HX711 (test/diagnostica)
+- bilancia HX711 (test/diagnostica:attualmente non usato)
 - OTA update (`esp32c3-ota`)
-- captive portal DNS su AP locale
 - debug seriale + telnet su porta 23
 
 ## Web site locale 192.168.4.1 
